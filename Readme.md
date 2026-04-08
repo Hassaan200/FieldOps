@@ -72,7 +72,7 @@ This creates three users to get started with — one for each role.
 
 ## Environment Variables
 
-See `backend/.env.example` — all variables are documented there.
+See `backend/.env.example` — all variables are documented there. Create a `.env` file in the backend directory and use same format like `backend/.env.example` while making .env file
 
 ## Assumptions
 
