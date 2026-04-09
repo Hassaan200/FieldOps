@@ -1,6 +1,6 @@
 # FieldOps — Field Service Management Platform
 
-A internal platform to manage field service jobs, assign technicians to those jobs and let clients track whats happening with their requests. Built as a take-home assessment but treated like a real project.
+An internal platform to manage field service operations — allowing admins to assign jobs, technicians to execute them, and clients to track progress in real time.
 
 ## Tech Stack
 
@@ -68,7 +68,21 @@ This creates three users to get started with — one for each role.
 | Technician | tech@fieldops.com | admin123 |
 | Client | client@fieldops.com | admin123 |
 
+## ⚠️ Important Testing Note
+
+Since the system uses JWT-based authentication, testing multiple user roles (Admin, Technician, Client) in the same browser can cause authorization conflicts (e.g., 403 Forbidden errors) due to token overwriting in localStorage.
+
+To properly test different roles simultaneously:
+
+- Use separate browsers (e.g., Chrome, Edge, Firefox), or  
+- Use Incognito/Private windows for each role  
+
+This ensures each session maintains its own authentication token without interfering with others.
+
 > Admin can create more users from the dashboard after logging in.
+
+> After users successfully logged in to their accounts they can change their passwords.
+
 
 ## Environment Variables
 
@@ -100,4 +114,4 @@ See `backend/.env.example` — all variables are documented there. Create a `.en
 - Unit and integration tests
 - Docker setup
 - Password reset via email (forgot password flow)
-- Audit log (who changed what and when) — the job notes partially cover this but its not a full audit trail
+- Client job request flow (clients submit request → admin approves → converted into job)
