@@ -120,13 +120,13 @@ const CreateJob = () => {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700 disabled:opacity-60"
+              className="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700 disabled:opacity-60 cursor-pointer"
             >
               {loading ? 'Creating...' : 'Create Job'}
             </button>
             <button
               onClick={() => navigate('/admin/jobs')}
-              className="bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm hover:bg-gray-300"
+              className="bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm hover:bg-gray-300 cursor-pointer"
             >
               Cancel
             </button>

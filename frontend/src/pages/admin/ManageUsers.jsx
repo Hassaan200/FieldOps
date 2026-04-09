@@ -15,10 +15,12 @@ const ManageUsers = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null); 
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  
 
   const fetchUsers = async () => {
     try {
@@ -53,15 +55,37 @@ const ManageUsers = () => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
+    const handleSubmit = async () => {
     setError('');
+    
+    // VALIDATION 
+    if (!form.name.trim()) {
+      setError('Name is required');
+      return;
+    }
+    if (!form.email.trim()) {
+      setError('Email is required');
+      return;
+    }
+    if (!editingUser && !form.password.trim()) {
+      setError('Password is required for new user');
+      return;
+    }
+    if (form.email && !form.email.includes('@')) {
+      setError('Valid email required');
+      return;
+    }
+    
+    setSubmitting(true);
     try {
       if (editingUser) {
-        await api.put(`/users/${editingUser.id}`, form);
+        // Password optional for edit here
+        const updateData = { name: form.name, email: form.email, role: form.role };
+        if (form.password) updateData.password = form.password;
+        await api.put(`/users/${editingUser.id}`, updateData);
         setSuccess('User updated!');
       } else {
-        // register route use karo — admin only
+        // If Create new user - password is required
         await api.post('/auth/register', form);
         setSuccess('User created!');
       }
@@ -77,13 +101,27 @@ const ManageUsers = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this user? This cannot be undone.')) return;
+    const handleDelete = async (id) => {
+    setDeleteConfirm(id); // delete modal opens
+  };
+
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/users/${id}`);
-      setUsers(prev => prev.filter(u => u.id !== id));
+      await api.delete(`/users/${deleteConfirm}`);
+      setUsers(prev => prev.filter(u => u.id !== deleteConfirm));
+      setSuccess('User deleted succesfully!');
+      setTimeout(() => {
+        setDeleteConfirm(null);
+        setSuccess('');
+      }, 2000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Delete failed');
+      setError(err.response?.data?.message || 'Delete failed');
+       setTimeout(() => {
+        setDeleteConfirm(null);
+        setError('');
+      }, 2000);
+    } finally {
+      setDeleteConfirm(false); // delete modal close
     }
   };
 
@@ -95,7 +133,7 @@ const ManageUsers = () => {
           <h2 className="text-2xl font-bold text-gray-800">Manage Users</h2>
           <button
             onClick={openCreate}
-            className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 cursor-pointer"
           >
             + Add User
           </button>
@@ -131,13 +169,13 @@ const ManageUsers = () => {
                     <td className="px-5 py-3 flex gap-2">
                       <button
                         onClick={() => openEdit(user)}
-                        className="text-blue-600 hover:underline text-xs"
+                        className="text-blue-600 hover:underline text-xs cursor-pointer"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(user.id)}
-                        className="text-red-500 hover:underline text-xs"
+                        className="text-red-500 hover:underline text-xs cursor-pointer"
                       >
                         Delete
                       </button>
@@ -152,7 +190,7 @@ const ManageUsers = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0  bg-opacity-10 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">
               {editingUser ? 'Edit User' : 'Create New User'}
@@ -205,7 +243,7 @@ const ManageUsers = () => {
                   name="role"
                   value={form.role}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
                   <option value="client">Client</option>
                   <option value="technician">Technician</option>
@@ -218,16 +256,59 @@ const ManageUsers = () => {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700 disabled:opacity-60"
+                className="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700 disabled:opacity-60 cursor-pointer"
               >
                 {submitting ? 'Saving...' : editingUser ? 'Update' : 'Create'}
               </button>
               <button
                 onClick={() => setShowModal(false)}
-                className="bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm hover:bg-gray-300"
+                className="bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm hover:bg-gray-300 cursor-pointer"
               >
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+            {/* Delete Confirmation Modal */}
+           {deleteConfirm && (
+        <div className="fixed inset-0 bg-opacity-10 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-800 mb-3">Delete User?</h3>
+            
+            {error ? (
+              <div className="bg-red-100 text-red-600 px-4 py-3 rounded mb-4">
+                {error}
+              </div>
+            ) : success ? (
+              <div className="bg-green-100 text-green-600 px-4 py-3 rounded mb-4 text-center">
+                ✓ {success}
+              </div>
+            ) : (
+              <p className="text-gray-600 mb-6">
+                Are you sure? This action cannot be undone.
+              </p>
+            )}
+            
+            <div className="flex gap-3 justify-end">
+              {!error && !success && (
+                <>
+                  <button
+                    onClick={() => setDeleteConfirm(null)}
+                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 cursor-pointer text-sm font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    disabled={submitting}
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer text-sm font-medium disabled:opacity-50"
+                  >
+                    {submitting ? 'Deleting...' : 'Delete'}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

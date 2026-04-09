@@ -63,7 +63,7 @@ const Navbar = () => {
                 <div className="relative" ref={dropdownRef}>
                     <button
                         onClick={handleBellClick}
-                        className="relative p-1 hover:bg-blue-500 rounded-full transition"
+                        className="relative p-1 hover:bg-blue-500 rounded-full transition cursor-pointer"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
@@ -119,7 +119,7 @@ const Navbar = () => {
                 </span>
                 <button
                     onClick={handleLogout}
-                    className="bg-white text-blue-600 px-3 py-1 rounded text-sm hover:bg-gray-100"
+                    className="bg-white text-blue-600 px-3 py-1 rounded text-sm hover:bg-gray-100 cursor-pointer"
                 >
                     Logout
                 </button>

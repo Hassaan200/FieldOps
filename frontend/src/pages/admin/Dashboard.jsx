@@ -48,19 +48,19 @@ const Dashboard = () => {
           <div className="flex gap-3">
             <button
               onClick={() => navigate('/admin/jobs/create')}
-              className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+              className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 cursor-pointer"
             >
               + Create Job
             </button>
             <button
               onClick={() => navigate('/admin/jobs')}
-              className="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800"
+              className="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 cursor-pointer"
             >
               Manage Jobs
             </button>
             <button
               onClick={() => navigate('/admin/users')}
-              className="bg-purple-600 text-white px-4 py-2 rounded text-sm hover:bg-purple-700"
+              className="bg-purple-600 text-white px-4 py-2 rounded text-sm hover:bg-purple-700 cursor-pointer"
             >
               Manage Users
             </button>

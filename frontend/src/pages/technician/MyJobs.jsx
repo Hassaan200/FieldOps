@@ -110,22 +110,22 @@ const TechnicianJobs = () => {
                         <button
                           onClick={() => handleStatusUpdate(job.id, 'in_progress')}
                           disabled={updating[job.id]}
-                          className="bg-orange-500 text-white px-3 py-1 rounded text-xs hover:bg-orange-600 disabled:opacity-60"
+                          className="bg-orange-500 text-white px-3 py-1 rounded text-xs hover:bg-orange-600 disabled:opacity-60 cursor-pointer"
                         >
                           Mark In Progress
                         </button>
-                      )}
+                      )}                
                       <button
                         onClick={() => handleStatusUpdate(job.id, 'completed')}
                         disabled={updating[job.id]}
-                        className="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 disabled:opacity-60"
+                        className="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 disabled:opacity-60 cursor-pointer"
                       >
                         Mark Completed
                       </button>
                       <button
                         onClick={() => handleStatusUpdate(job.id, 'cancelled')}
                         disabled={updating[job.id]}
-                        className="bg-red-400 text-white px-3 py-1 rounded text-xs hover:bg-red-500 disabled:opacity-60"
+                        className="bg-red-400 text-white px-3 py-1 rounded text-xs hover:bg-red-500 disabled:opacity-60 cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -133,7 +133,7 @@ const TechnicianJobs = () => {
                   )}
                   <button
                     onClick={() => fetchNotes(job.id)}
-                    className="bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs hover:bg-gray-200"
+                    className="bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs hover:bg-gray-200 cursor-pointer"
                   >
                     {expandedJob === job.id ? 'Hide Notes' : 'View Notes'}
                   </button>
@@ -168,7 +168,7 @@ const TechnicianJobs = () => {
                       />
                       <button
                         onClick={() => handleAddNote(job.id)}
-                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 cursor-pointer"
                       >
                         Add
                       </button>

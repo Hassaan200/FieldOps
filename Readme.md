@@ -115,3 +115,42 @@ See `backend/.env.example` — all variables are documented there. Create a `.en
 - Docker setup
 - Password reset via email (forgot password flow)
 - Client job request flow (clients submit request → admin approves → converted into job)
+
+## API Reference
+
+All endpoints require `Authorization: Bearer <token>` header except login.
+
+### Auth
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| POST | /api/auth/login | Public | Login for all roles |
+| POST | /api/auth/register | Admin | Create a new user |
+
+### Jobs
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| POST | /api/jobs | Admin | Create a new job |
+| GET | /api/jobs | Admin | Get all jobs |
+| GET | /api/jobs/my | Technician | Get my assigned jobs |
+| GET | /api/jobs/client | Client | Get my jobs |
+| PATCH | /api/jobs/:id/assign | Admin | Assign technician to job |
+| PATCH | /api/jobs/:id/status | Technician | Update job status |
+| PATCH | /api/jobs/:id/admin-status | Admin | Override job status |
+| POST | /api/jobs/:id/notes | All roles | Add note to job |
+| GET | /api/jobs/:id/notes | All roles | Get job notes |
+
+### Users
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | /api/users | Admin | Get all users |
+| GET | /api/users/clients | Admin | Get all clients |
+| GET | /api/users/technicians | Admin | Get all technicians |
+| PUT | /api/users/:id | Admin | Update a user |
+| DELETE | /api/users/:id | Admin | Delete a user |
+| PUT | /api/users/profile/password | All roles | Change own password |
+
+### Notifications
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | /api/notifications | All roles | Get my notifications |
+| PATCH | /api/notifications/read-all | All roles | Mark all as read |

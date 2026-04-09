@@ -61,7 +61,6 @@ export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // admin khud ko delete na kar sake
     if (parseInt(id) === req.user.id) {
       return res.status(400).json({ message: 'You cannot delete your own account' });
     }
@@ -69,9 +68,32 @@ export const deleteUser = async (req, res) => {
     const [existing] = await pool.query(`SELECT * FROM users WHERE id = ?`, [id]);
     if (existing.length === 0) return res.status(404).json({ message: 'User not found' });
 
+    // pehle linked data delete hoga related user ka
+    await pool.query(`DELETE FROM notifications WHERE user_id = ?`, [id]);
+    await pool.query(`DELETE FROM job_notes WHERE user_id = ?`, [id]);
+
+    // agar technician hoga toh uski jobs unassign hongi
+    await pool.query(
+      `UPDATE jobs SET technician_id = NULL, status = 'pending' WHERE technician_id = ?`,
+      [id]
+    );
+
+    // agar client hai toh uski jobs ki notes aur notifications delete honge
+    const [clientJobs] = await pool.query(`SELECT id FROM jobs WHERE client_id = ?`, [id]);
+    for (const job of clientJobs) {
+      await pool.query(`DELETE FROM job_notes WHERE job_id = ?`, [job.id]);
+      await pool.query(`DELETE FROM notifications WHERE user_id = ?`, [id]);
+    }
+
+    // ab client ki jobs delete hongi
+    await pool.query(`DELETE FROM jobs WHERE client_id = ?`, [id]);
+
+    // than  user delete hoga finally 
     await pool.query(`DELETE FROM users WHERE id = ?`, [id]);
-    res.json({ message: 'User deleted' });
+
+    res.json({ message: 'User deleted successfully' });
   } catch (err) {
+    console.error('Delete error:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };

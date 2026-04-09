@@ -66,7 +66,7 @@ const ManageJobs = () => {
           <h2 className="text-2xl font-bold text-gray-800">All Jobs</h2>
           <button
             onClick={() => navigate('/admin/jobs/create')}
-            className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 cursor-pointer"
           >
             + Create Job
           </button>
@@ -104,7 +104,7 @@ const ManageJobs = () => {
                     defaultValue=""
                     onChange={(e) => handleAssign(job.id, e.target.value)}
                     disabled={assigning[job.id]}
-                    className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
                   >
                     <option value="">Reassign technician...</option>
                     {technicians.map(t => (
@@ -115,7 +115,7 @@ const ManageJobs = () => {
                   <select
                     defaultValue=""
                     onChange={(e) => handleAdminStatus(job.id, e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
                   >
                     <option value="">Change status...</option>
                     <option value="pending">Pending</option>
