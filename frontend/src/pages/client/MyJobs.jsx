@@ -52,6 +52,23 @@ const ClientJobs = () => {
     }
   };
 
+  useEffect(() => {
+  const load = async () => {
+    try {
+      const res = await api.get('/jobs/client');
+      setJobs(res.data);
+    } catch (err) {
+      console.error('Failed to fetch jobs', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  load();
+  const interval = setInterval(load, 30000);
+  return () => clearInterval(interval);
+}, []);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />

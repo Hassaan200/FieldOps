@@ -43,7 +43,8 @@ Open `.env` and fill in your database password and a JWT secret of your choice, 
 npm run dev
 
 
-Server runs on `http://(PUT_YOUR_IP):5000`
+Backend Server runs on `http://(PUT_YOUR_IP):5000`
+> Replace `(PUT_YOUR_IP)` with your machine’s local IP (e.g., 192.168.x.x).
 
 ### 4. Setup Frontend
 
@@ -53,6 +54,10 @@ npm run dev
 
 
 Frontend runs on `http://(PUT_YOUR_IP):4000`
+> Replace `(PUT_YOUR_IP)` with your machine’s local IP (e.g., 192.168.x.x).
+
+>The app is configured to run using your local machine IP instead of localhost.
+>This allows access from other devices on the same network if needed.
 
 ### 5. Seed Default Users
 
@@ -104,7 +109,7 @@ See `backend/.env.example` — all variables are documented there. Create a `.en
 - Chose JWT over sessions — simpler to setup, no session store needed, works fine for this scale.
 - In-app notifications over email — keeps the project running fully locally without any third party service. In a real product id hook this up to something like SendGrid.
 - No pagination yet — acceptable for a small dataset but would add it before going to production.
-- Frontend is functional not polished — focused on getting all the flows working correctly.
+- Frontend is functional not polished and responsive — focused on getting all the flows working correctly.
 - No unit tests written — would add these with more time, especially for the auth middleware and job assignment logic.
 
 ## What's Missing

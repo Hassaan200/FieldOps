@@ -57,6 +57,12 @@ const ManageJobs = () => {
       console.error('Admin status update failed', err);
     }
   };
+  useEffect(() => {
+  fetchData();
+  // har 30 second mein jobs, satatus bhe refresh honge
+  const interval = setInterval(fetchData, 30000);
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <div className="min-h-screen bg-gray-100">

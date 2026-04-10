@@ -22,7 +22,7 @@ const Navbar = () => {
 
     useEffect(() => {
         fetchNotifications();
-        // har 30 second mein check karo
+        // har 30 second mein check hogi notification
         const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
     }, []);
@@ -79,7 +79,7 @@ const Navbar = () => {
                     </button>
 
                     {showDropdown && (
-                        <div className="absolute right-0 mt-2 w-80 bg-white text-gray-800 
+                        <div className="absolute sm:right-0 right--50 mt-2 sm:w-80 w-50 bg-white text-gray-800 
               rounded-lg shadow-xl z-50 overflow-hidden">
                             <div className="px-4 py-2 border-b bg-gray-50">
                                 <p className="text-sm font-semibold text-gray-700">Notifications</p>
@@ -108,18 +108,18 @@ const Navbar = () => {
                     )}
                 </div>
 
-                <span className="text-sm capitalize bg-blue-500 px-3 py-1 rounded-full">
+                <span className="sm:text-sm text-[10px] capitalize bg-blue-500 px-3 py-1 rounded-full">
                     {user?.role}
                 </span>
                 <span
                     onClick={() => navigate('/profile')}
-                    className="text-sm cursor-pointer hover:underline"
+                    className="text-[10px] sm:text-sm cursor-pointer hover:underline"
                 >
                     {user?.name}
                 </span>
                 <button
                     onClick={handleLogout}
-                    className="bg-white text-blue-600 px-3 py-1 rounded text-sm hover:bg-gray-100 cursor-pointer"
+                    className="bg-white text-blue-600 sm:px-3 sm:py-1 px-1.5 py-1 rounded text-[10px] hover:bg-gray-100 cursor-pointer sm:text-sm"
                 >
                     Logout
                 </button>

@@ -69,6 +69,12 @@ const TechnicianJobs = () => {
       console.error('Failed to add note', err);
     }
   };
+// refresh data after 30 seconds.
+  useEffect(() => {
+  fetchJobs();
+  const interval = setInterval(fetchJobs, 30000);
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
