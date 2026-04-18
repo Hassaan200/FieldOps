@@ -143,47 +143,84 @@ const ManageUsers = () => {
           <p className="text-gray-500">Loading users...</p>
         ) : (
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left px-5 py-3 text-gray-600 font-medium">Name</th>
-                  <th className="text-left px-5 py-3 text-gray-600 font-medium">Email</th>
-                  <th className="text-left px-5 py-3 text-gray-600 font-medium">Role</th>
-                  <th className="text-left px-5 py-3 text-gray-600 font-medium">Joined</th>
-                  <th className="text-left px-5 py-3 text-gray-600 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {users.map(user => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-5 py-3 font-medium text-gray-800">{user.name}</td>
-                    <td className="px-5 py-3 text-gray-600">{user.email}</td>
-                    <td className="px-5 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${roleColors[user.role]}`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-gray-400 text-xs">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-5 py-3 flex gap-2">
-                      <button
-                        onClick={() => openEdit(user)}
-                        className="text-blue-600 hover:underline text-xs cursor-pointer"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="text-red-500 hover:underline text-xs cursor-pointer"
-                      >
-                        Delete
-                      </button>
-                    </td>
+            {/* Mobile View - Card Layout */}
+            <div className="md:hidden space-y-3 p-4">
+              {users.map(user => (
+                <div key={user.id} className="border border-gray-200 rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-gray-800">{user.name}</p>
+                      <p className="text-sm text-gray-600">{user.email}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${roleColors[user.role]}`}>
+                      {user.role}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    Joined: {new Date(user.created_at).toLocaleDateString()}
+                  </p>
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={() => openEdit(user)}
+                      className="flex-1 text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded text-xs font-medium cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      className="flex-1 text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded text-xs font-medium cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop View - Table Layout */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="text-left px-5 py-3 text-gray-600 font-medium">Name</th>
+                    <th className="text-left px-5 py-3 text-gray-600 font-medium">Email</th>
+                    <th className="text-left px-5 py-3 text-gray-600 font-medium">Role</th>
+                    <th className="text-left px-5 py-3 text-gray-600 font-medium">Joined</th>
+                    <th className="text-left px-5 py-3 text-gray-600 font-medium">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y">
+                  {users.map(user => (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="px-5 py-3 font-medium text-gray-800">{user.name}</td>
+                      <td className="px-5 py-3 text-gray-600">{user.email}</td>
+                      <td className="px-5 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${roleColors[user.role]}`}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-gray-400 text-xs">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-5 py-3 flex gap-2">
+                        <button
+                          onClick={() => openEdit(user)}
+                          className="text-blue-600 hover:underline text-xs cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(user.id)}
+                          className="text-red-500 hover:underline text-xs cursor-pointer"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

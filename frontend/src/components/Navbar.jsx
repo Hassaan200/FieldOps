@@ -9,7 +9,9 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
     const dropdownRef = useRef(null);
+    const mobileMenuRef = useRef(null);
 
     const fetchNotifications = async () => {
         try {
@@ -33,6 +35,9 @@ const Navbar = () => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
                 setShowDropdown(false);
             }
+            if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+                setShowMobileMenu(false);
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -55,11 +60,12 @@ const Navbar = () => {
     const unreadCount = notifications.filter(n => !n.is_read).length;
 
     return (
-        <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
-            <h1 className="text-xl font-bold">FieldOps</h1>
+        <nav className="bg-blue-600 text-white px-4 sm:px-6 py-4 flex justify-between items-center">
+            {/* Website Name */}
+            <h1 className="text-lg sm:text-xl font-bold">FieldOps</h1>
 
-            <div className="flex items-center gap-4">
-                {/* notification bell */}
+            <div className="flex items-center gap-2 sm:gap-4">
+                {/* Notification Bell - Always Visible */}
                 <div className="relative" ref={dropdownRef}>
                     <button
                         onClick={handleBellClick}
@@ -79,7 +85,7 @@ const Navbar = () => {
                     </button>
 
                     {showDropdown && (
-                        <div className="absolute sm:right-0 right--50 mt-2 sm:w-80 w-50 bg-white text-gray-800 
+                        <div className="absolute sm:right-0 right-4 mt-2 sm:w-80 w-60 bg-white text-gray-800 
               rounded-lg shadow-xl z-50 overflow-hidden">
                             <div className="px-4 py-2 border-b bg-gray-50">
                                 <p className="text-sm font-semibold text-gray-700">Notifications</p>
@@ -108,21 +114,63 @@ const Navbar = () => {
                     )}
                 </div>
 
-                <span className="sm:text-sm text-[10px] capitalize bg-blue-500 px-3 py-1 rounded-full">
-                    {user?.role}
-                </span>
-                <span
-                    onClick={() => navigate('/profile')}
-                    className="text-[10px] sm:text-sm cursor-pointer hover:underline"
-                >
-                    {user?.name}
-                </span>
-                <button
-                    onClick={handleLogout}
-                    className="bg-white text-blue-600 sm:px-3 sm:py-1 px-1.5 py-1 rounded text-[10px] hover:bg-gray-100 cursor-pointer sm:text-sm"
-                >
-                    Logout
-                </button>
+                {/* Desktop Menu - Hide on Mobile */}
+                <div className="hidden sm:flex items-center gap-3">
+                    <span className="text-sm capitalize bg-blue-500 px-3 py-1 rounded-full">
+                        {user?.role}
+                    </span>
+                    <span
+                        onClick={() => navigate('/profile')}
+                        className="text-sm cursor-pointer hover:underline"
+                    >
+                        {user?.name}
+                    </span>
+                    <button
+                        onClick={handleLogout}
+                        className="bg-white text-blue-600 px-3 py-1 rounded text-sm hover:bg-gray-100 cursor-pointer"
+                    >
+                        Logout
+                    </button>
+                </div>
+
+                {/* Mobile Hamburger Menu - Show Only on Mobile */}
+                <div className="sm:hidden relative" ref={mobileMenuRef}>
+                    <button
+                        onClick={() => setShowMobileMenu(!showMobileMenu)}
+                        className="p-1 hover:bg-blue-500 rounded-full transition cursor-pointer"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+
+                    {showMobileMenu && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-xl z-50 overflow-hidden">
+                            <div className="px-4 py-3 border-b bg-gray-50 space-y-2">
+                                <p className="font-semibold text-gray-800">{user?.name}</p>
+                                <p className="text-xs text-gray-500">
+                                    <span className="capitalize bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                                        {user?.role}
+                                    </span>
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => navigate('/profile')}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                👤 View Profile
+                            </button>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 border-t"
+                            >
+                                🚪 Logout
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </nav>
     );
