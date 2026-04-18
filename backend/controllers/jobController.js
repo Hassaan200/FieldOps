@@ -81,7 +81,7 @@ export const getMyJobs = async (req, res) => {
        FROM jobs j
        LEFT JOIN users c ON j.client_id = c.id
        WHERE j.technician_id = ?
-       ORDER BY j.scheduled_at ASC`,
+       ORDER BY j.created_at DESC`,
       [req.user.id]
     );
     res.json(jobs);
@@ -170,14 +170,37 @@ export const addNote = async (req, res) => {
   const { id } = req.params;
   const { note } = req.body;
 
-  if (!note) return res.status(400).json({ message: 'Note cannot be empty' });
+  if (!note) return res.status(400).json({ message: 'Message cannot be empty' });
 
   try {
     await pool.query(
       `INSERT INTO job_notes (job_id, user_id, note) VALUES (?, ?, ?)`,
       [id, req.user.id, note]
     );
-    res.status(201).json({ message: 'Note added' });
+
+    // job fetch karo taake client aur technician ID mile
+    const [job] = await pool.query(`SELECT * FROM jobs WHERE id = ?`, [id]);
+    if (job.length > 0) {
+      const j = job[0];
+
+      // agar technician ne message kiya tou client ko notify karo
+      if (req.user.role === 'technician' && j.client_id) {
+        await pool.query(
+          `INSERT INTO notifications (user_id, message) VALUES (?, ?)`,
+          [j.client_id, `New message from technician on your job: "${j.title}"`]
+        );
+      }
+
+      // agar client ne message kiya tou technician ko notify karo
+      if (req.user.role === 'client' && j.technician_id) {
+        await pool.query(
+          `INSERT INTO notifications (user_id, message) VALUES (?, ?)`,
+          [j.technician_id, `New message from client on job: "${j.title}"`]
+        );
+      }
+    }
+
+    res.status(201).json({ message: 'Message sent' });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

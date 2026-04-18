@@ -8,27 +8,31 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // fetchStats ko component level par define karo
+  const fetchStats = async () => {
+    try {
+      const res = await api.get('/jobs');
+      const jobs = res.data;
+
+      setStats({
+        total: jobs.length,
+        pending: jobs.filter(j => j.status === 'pending').length,
+        assigned: jobs.filter(j => j.status === 'assigned').length,
+        in_progress: jobs.filter(j => j.status === 'in_progress').length,
+        completed: jobs.filter(j => j.status === 'completed').length,
+      });
+    } catch (err) {
+      console.error('Failed to fetch jobs', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // har 5 seconds mein refresh karo (dashboard me data frequently badal sakta hai)
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await api.get('/jobs');
-        const jobs = res.data;
-
-        setStats({
-          total: jobs.length,
-          pending: jobs.filter(j => j.status === 'pending').length,
-          assigned: jobs.filter(j => j.status === 'assigned').length,
-          in_progress: jobs.filter(j => j.status === 'in_progress').length,
-          completed: jobs.filter(j => j.status === 'completed').length,
-        });
-      } catch (err) {
-        console.error('Failed to fetch jobs', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
+    const interval = setInterval(fetchStats, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const cards = [

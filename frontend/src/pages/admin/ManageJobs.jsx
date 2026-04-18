@@ -59,8 +59,8 @@ const ManageJobs = () => {
   };
   useEffect(() => {
   fetchData();
-  // har 30 second mein jobs, satatus bhe refresh honge
-  const interval = setInterval(fetchData, 30000);
+  // har 10 seconds mein jobs, status bhe refresh honge
+  const interval = setInterval(fetchData, 10000);
   return () => clearInterval(interval);
 }, []);
 

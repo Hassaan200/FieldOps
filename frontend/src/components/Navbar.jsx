@@ -22,8 +22,8 @@ const Navbar = () => {
 
     useEffect(() => {
         fetchNotifications();
-        // har 30 second mein check hogi notification
-        const interval = setInterval(fetchNotifications, 30000);
+        // har 5 second mein check hogi notification
+        const interval = setInterval(fetchNotifications, 5000);
         return () => clearInterval(interval);
     }, []);
 

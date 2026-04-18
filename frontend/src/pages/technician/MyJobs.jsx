@@ -17,6 +17,7 @@ const TechnicianJobs = () => {
   const [newNote, setNewNote] = useState({});
   const [updating, setUpdating] = useState({});
   const [expandedJob, setExpandedJob] = useState(null);
+  const [unreadMessages, setUnreadMessages] = useState({});
 
   const fetchJobs = async () => {
     try {
@@ -40,6 +41,8 @@ const TechnicianJobs = () => {
       const res = await api.get(`/jobs/${jobId}/notes`);
       setNotes(prev => ({ ...prev, [jobId]: res.data }));
       setExpandedJob(jobId);
+      // open hone pr unread clear karo
+      setUnreadMessages(prev => ({ ...prev, [jobId]: 0 }));
     } catch (err) {
       console.error('Failed to fetch notes', err);
     }
@@ -69,12 +72,72 @@ const TechnicianJobs = () => {
       console.error('Failed to add note', err);
     }
   };
-// refresh data after 30 seconds.
+  // refresh data after 10 seconds.
   useEffect(() => {
-  fetchJobs();
-  const interval = setInterval(fetchJobs, 30000);
-  return () => clearInterval(interval);
-}, []);
+    fetchJobs();
+    const interval = setInterval(async () => {
+      fetchJobs();
+      // har job ke messages check karo silently
+      for (const job of jobs) {
+        try {
+          const res = await api.get(`/jobs/${job.id}/notes`);
+          const newCount = res.data.length;
+          const oldCount = notes[job.id]?.length || 0;
+          if (newCount > oldCount && expandedJob !== job.id) {
+            setUnreadMessages(prev => ({
+              ...prev,
+              [job.id]: (prev[job.id] || 0) + (newCount - oldCount)
+            }));
+          }
+        } catch (err) { }
+      }
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [jobs]);
+
+  // message ke lye useeffect
+
+  // useEffect mein messages ko har 2 seconds check karo (sirf jo expanded ho)
+  useEffect(() => {
+    if (expandedJob) {
+      // expanded job ke messages ko frequently fetch karo
+      const fetchLatestNotes = async () => {
+        try {
+          const res = await api.get(`/jobs/${expandedJob}/notes`);
+          setNotes(prev => ({ ...prev, [expandedJob]: res.data }));
+        } catch (err) {
+          console.error('Failed to fetch notes', err);
+        }
+      };
+
+      // har 2 second mein refresh
+      const interval = setInterval(fetchLatestNotes, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [expandedJob]);
+
+  // har 5 seconds mein unread messages check karo (jo expanded nahi ho)
+  useEffect(() => {
+    fetchJobs();
+    const interval = setInterval(async () => {
+      try {
+        const jobsRes = await api.get('/jobs/my');
+        setJobs(jobsRes.data);
+
+        jobsRes.data.forEach(async (job) => {
+          if (expandedJob !== job.id) {
+            try {
+              const res = await api.get(`/jobs/${job.id}/notes`);
+              const unread = res.data.filter(note => !note.is_read).length;
+              setUnreadMessages(prev => ({ ...prev, [job.id]: unread }));
+            } catch (err) { }
+          }
+        });
+      } catch (err) { }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [expandedJob]);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -120,7 +183,7 @@ const TechnicianJobs = () => {
                         >
                           Mark In Progress
                         </button>
-                      )}                
+                      )}
                       <button
                         onClick={() => handleStatusUpdate(job.id, 'completed')}
                         disabled={updating[job.id]}
@@ -139,44 +202,60 @@ const TechnicianJobs = () => {
                   )}
                   <button
                     onClick={() => fetchNotes(job.id)}
-                    className="bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs hover:bg-gray-200 cursor-pointer"
+                    className="relative bg-gray-100 text-gray-600 px-3 py-1 rounded text-xs hover:bg-gray-200"
                   >
-                    {expandedJob === job.id ? 'Hide Notes' : 'View Notes'}
+                    {expandedJob === job.id ? 'Hide Messages' : '💬 Messages'}
+                    {/* {unreadMessages[job.id] > 0 && (
+    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs 
+      rounded-full h-4 w-4 flex items-center justify-center font-bold">
+      {unreadMessages[job.id]}
+    </span>
+  )} */}
                   </button>
                 </div>
 
                 {/* notes section */}
                 {expandedJob === job.id && (
                   <div className="mt-4 border-t pt-4">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2">Notes / Updates</h4>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                      💬 Messages
+                    </h4>
                     {notes[job.id]?.length === 0 ? (
-                      <p className="text-xs text-gray-400 mb-3">No notes yet.</p>
+                      <p className="text-xs text-gray-400 mb-3">No messages yet.</p>
                     ) : (
                       <div className="space-y-2 mb-3">
-                        {notes[job.id]?.map(note => (
-                          <div key={note.id} className="bg-gray-50 rounded px-3 py-2 text-sm">
-                            <span className="font-medium text-gray-700">{note.added_by}: </span>
-                            <span className="text-gray-600">{note.note}</span>
-                            <span className="text-xs text-gray-400 ml-2">
-                              {new Date(note.created_at).toLocaleString()}
-                            </span>
+                        {notes[job.id]?.map(msg => (
+                          <div
+                            key={msg.id}
+                            className={`rounded px-3 py-2 text-sm max-w-xs ${msg.added_by === job.client_name
+                              ? 'bg-gray-100 text-gray-700 self-start'
+                              : 'bg-blue-100 text-blue-800 ml-auto'
+                              }`}
+                          >
+                            <span className="font-medium">{msg.added_by}: </span>
+                            <span>{msg.note}</span>
+                            <div className="text-xs text-gray-400 mt-1">
+                              {new Date(msg.created_at).toLocaleString()}
+                            </div>
                           </div>
                         ))}
                       </div>
                     )}
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mt-2">
                       <input
                         value={newNote[job.id] || ''}
-                        onChange={(e) => setNewNote(prev => ({ ...prev, [job.id]: e.target.value }))}
-                        placeholder="Add a note or update..."
+                        onChange={(e) =>
+                          setNewNote(prev => ({ ...prev, [job.id]: e.target.value }))
+                        }
+                        placeholder="Type a message..."
                         className="flex-1 border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                       />
                       <button
                         onClick={() => handleAddNote(job.id)}
-                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 cursor-pointer"
+                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
                       >
-                        Add
+                        Send
                       </button>
                     </div>
                   </div>
