@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
@@ -8,8 +8,18 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
+
+  // Agar user already logged in hai tou dashboard par le jao
+  useEffect(() => {
+    if (user) {
+      const role = user.role;
+      if (role === 'admin') navigate('/admin/dashboard', { replace: true });
+      else if (role === 'technician') navigate('/technician/jobs', { replace: true });
+      else navigate('/client/jobs', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,9 +31,10 @@ const Login = () => {
       login(res.data.user, res.data.token);
 
       const role = res.data.user.role;
-      if (role === 'admin') navigate('/admin/dashboard');
-      else if (role === 'technician') navigate('/technician/jobs');
-      else navigate('/client/jobs');
+      // { replace: true } - history mein add na ho, just replace karo
+      if (role === 'admin') navigate('/admin/dashboard', { replace: true });
+      else if (role === 'technician') navigate('/technician/jobs', { replace: true });
+      else navigate('/client/jobs', { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {

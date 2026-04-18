@@ -54,7 +54,7 @@ const Navbar = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     const unreadCount = notifications.filter(n => !n.is_read).length;
