@@ -1,8 +1,15 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ye path Vercel ke lye
+const caPath = path.resolve(__dirname, '../ca.pem'); 
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -11,10 +18,10 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
   ssl: {
-     ca: fs.readFileSync(path.join(process.cwd(), 'ca.pem')),
+     ca: fs.readFileSync(caPath),
      rejectUnauthorized: true 
   },
-  connectTimeout: 10000 
+   
 });
 
 export default pool;
