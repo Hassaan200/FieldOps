@@ -22,3 +22,6 @@ app.get('/', (req, res) => res.json({ message: 'FieldOps API running' }));
 const PORT = process.env.PORT || 5000;
 // backend server is ruuning on computer's IP not on local host.
 app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+
+// Vercel ke liye export karna zaroori hai
+export default app; 
