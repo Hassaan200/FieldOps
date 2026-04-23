@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 
-
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -24,12 +23,10 @@ const Navbar = () => {
 
     useEffect(() => {
         fetchNotifications();
-        // har 5 second mein check hogi notification
         const interval = setInterval(fetchNotifications, 5000);
         return () => clearInterval(interval);
     }, []);
 
-    // bahar click karo tou dropdown band ho
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -47,7 +44,6 @@ const Navbar = () => {
         setShowDropdown(prev => !prev);
         if (!showDropdown) {
             await api.patch('/notifications/read-all');
-            // local state bhi update
             setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
         }
     };
@@ -59,53 +55,79 @@ const Navbar = () => {
 
     const unreadCount = notifications.filter(n => !n.is_read).length;
 
-    return (
-        <nav className="bg-blue-600 text-white px-4 sm:px-6 py-4 flex justify-between items-center">
-            {/* Website Name */}
-            <h1 className="text-lg sm:text-xl font-bold">FieldOps</h1>
+    /* Avatar initials helper */
+    const initials = user?.name
+        ? user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+        : 'U';
 
-            <div className="flex items-center gap-2 sm:gap-4">
-                {/* Notification Bell - Always Visible */}
+    return (
+        <nav className="bg-white border-b border-gray-100 shadow-sm px-4 sm:px-8 py-0 flex justify-between items-center h-16 sticky top-0 z-40">
+
+            {/* ── Logo ── */}
+            <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/admin/dashboard')}>
+                <div className="w-8 h-8 rounded-lg bg-[#1a3a2a] flex items-center justify-center shadow-md shadow-emerald-900/20">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" strokeWidth={2.2} className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6-10l6-3m0 13l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 10m0 3V7" />
+                    </svg>
+                </div>
+                <span className="text-[1.05rem] font-bold text-[#1a3a2a] tracking-tight">FieldOps</span>
+            </div>
+
+            {/* ── Right side ── */}
+            <div className="flex items-center gap-1 sm:gap-2">
+
+                {/* Notification Bell */}
                 <div className="relative" ref={dropdownRef}>
                     <button
                         onClick={handleBellClick}
-                        className="relative p-1 hover:bg-blue-500 rounded-full transition cursor-pointer"
+                        className="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-5-5.917V4a1 1 0 10-2 0v1.083A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5 text-gray-600">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-5-5.917V4a1 1 0 10-2 0v1.083A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                         {unreadCount > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs 
-                rounded-full h-4 w-4 flex items-center justify-center font-bold">
-                                {unreadCount}
-                            </span>
+                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
                         )}
                     </button>
 
+                    {/* Notification Dropdown */}
                     {showDropdown && (
-                        <div className="absolute sm:right-0 right-4 mt-2 sm:w-80 w-60 bg-white text-gray-800 
-              rounded-lg shadow-xl z-50 overflow-hidden">
-                            <div className="px-4 py-2 border-b bg-gray-50">
-                                <p className="text-sm font-semibold text-gray-700">Notifications</p>
+                        <div className="absolute right-0 mt-2 sm:w-80 w-66 bg-white rounded-2xl shadow-xl shadow-gray-200/80 border border-gray-100 z-50 overflow-hidden">
+                            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                                <p className="text-sm font-semibold text-gray-800">Notifications</p>
+                                {unreadCount === 0 && (
+                                    <span className="text-[10px] font-medium bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">All read</span>
+                                )}
+                                {unreadCount > 0 && (
+                                    <span className="text-[10px] font-semibold bg-red-50 text-red-500 px-2 py-0.5 rounded-full">
+                                        {unreadCount} new
+                                    </span>
+                                )}
                             </div>
 
                             {notifications.length === 0 ? (
-                                <p className="text-sm text-gray-500 px-4 py-4 text-center">
-                                    No notifications yet
-                                </p>
+                                <div className="flex flex-col items-center justify-center py-10 gap-2">
+                                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="w-5 h-5 text-gray-300">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-5-5.917V4a1 1 0 10-2 0v1.083A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-sm text-gray-400 font-medium">No notifications yet</p>
+                                </div>
                             ) : (
-                                <div className="max-h-72 overflow-y-auto divide-y">
+                                <div className="max-h-72 overflow-y-auto divide-y divide-gray-50">
                                     {notifications.map(n => (
                                         <div
                                             key={n.id}
-                                            className={`px-4 py-3 text-sm ${!n.is_read ? 'bg-blue-50' : 'bg-white'}`}
+                                            className={`px-4 py-3 flex gap-3 items-start transition-colors ${!n.is_read ? 'bg-emerald-50/60' : 'bg-white hover:bg-gray-50'}`}
                                         >
-                                            <p className="text-gray-700">{n.message}</p>
-                                            <p className="text-xs text-gray-400 mt-1">
-                                                {new Date(n.created_at).toLocaleString()}
-                                            </p>
+                                            <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${!n.is_read ? 'bg-emerald-500' : 'bg-gray-200'}`} />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm text-gray-700 leading-snug">{n.message}</p>
+                                                <p className="text-[11px] text-gray-400 mt-1">
+                                                    {new Date(n.created_at).toLocaleString()}
+                                                </p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -114,59 +136,91 @@ const Navbar = () => {
                     )}
                 </div>
 
-                {/* Desktop Menu - Hide on Mobile */}
-                <div className="hidden sm:flex items-center gap-3">
-                    <span className="text-sm capitalize bg-blue-500 px-3 py-1 rounded-full">
-                        {user?.role}
-                    </span>
-                    <span
+                {/* Divider */}
+                <div className="hidden sm:block w-px h-6 bg-gray-200 mx-1" />
+
+                {/* Desktop User Info */}
+                <div className="hidden sm:flex items-center gap-2.5">
+                    <div className="text-right hidden md:block">
+                        <p
+                            onClick={() => navigate('/profile')}
+                            className="text-sm font-semibold text-gray-800 cursor-pointer hover:text-[#1a3a2a] transition-colors leading-tight"
+                        >
+                            {user?.name}
+                        </p>
+                        <p className="text-[11px] text-gray-400 capitalize leading-tight">{user?.role}</p>
+                    </div>
+
+                    {/* Avatar */}
+                    <div
                         onClick={() => navigate('/profile')}
-                        className="text-sm cursor-pointer hover:underline"
+                        className="w-8 h-8 rounded-xl bg-[#1a3a2a] text-emerald-200 text-xs font-bold flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity select-none"
                     >
-                        {user?.name}
-                    </span>
+                        {initials}
+                    </div>
+
+                    {/* Logout */}
                     <button
                         onClick={handleLogout}
-                        className="bg-white text-blue-600 px-3 py-1 rounded text-sm hover:bg-gray-100 cursor-pointer"
+                        className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-red-500 px-3 py-1.5 rounded-xl hover:bg-red-50 transition-all duration-150 cursor-pointer"
                     >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
                         Logout
                     </button>
                 </div>
 
-                {/* Mobile Hamburger Menu - Show Only on Mobile */}
+                {/* Mobile Hamburger */}
                 <div className="sm:hidden relative" ref={mobileMenuRef}>
                     <button
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
-                        className="p-1 hover:bg-blue-500 rounded-full transition cursor-pointer"
+                        className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
+                        {showMobileMenu ? (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-600">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-gray-600">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        )}
                     </button>
 
                     {showMobileMenu && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-xl z-50 overflow-hidden">
-                            <div className="px-4 py-3 border-b bg-gray-50 space-y-2">
-                                <p className="font-semibold text-gray-800">{user?.name}</p>
-                                <p className="text-xs text-gray-500">
-                                    <span className="capitalize bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-gray-200/80 border border-gray-100 z-50 overflow-hidden">
+                            {/* User info header */}
+                            <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-[#1a3a2a] text-emerald-200 text-xs font-bold flex items-center justify-center select-none flex-shrink-0">
+                                    {initials}
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-sm font-semibold text-gray-800 truncate">{user?.name}</p>
+                                    <span className="text-[10px] font-semibold capitalize bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">
                                         {user?.role}
                                     </span>
-                                </p>
+                                </div>
                             </div>
+
                             <button
                                 onClick={() => navigate('/profile')}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
                             >
-                                👤 View Profile
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4 text-gray-400">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                View Profile
                             </button>
+
                             <button
                                 onClick={handleLogout}
-                                className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 border-t"
+                                className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2.5 border-t border-gray-100 transition-colors"
                             >
-                                🚪 Logout
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Logout
                             </button>
                         </div>
                     )}
