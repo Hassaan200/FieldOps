@@ -20,6 +20,8 @@ const TechnicianJobs = () => {
   const [unreadMessages, setUnreadMessages] = useState({});
 
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const prevCountRef = useRef({});
 
   const fetchJobs = async () => {
     try {
@@ -72,10 +74,22 @@ const TechnicianJobs = () => {
   };
 
   useEffect(() => {
-  if (messagesEndRef.current) {
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-  }
-}, [notes]);
+    if (expandedJob) {
+      const currentCount = notes[expandedJob]?.length || 0;
+      const prevCount = prevCountRef.current[expandedJob] || 0;
+      
+      // Scroll only if messages increased (new message arrived)
+      if (currentCount > prevCount) {
+        setTimeout(() => {
+          if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+          }
+        }, 50);
+      }
+      
+      prevCountRef.current[expandedJob] = currentCount;
+    }
+  }, [notes, expandedJob]);
 
   useEffect(() => {
     fetchJobs();
@@ -315,7 +329,7 @@ const TechnicianJobs = () => {
                       </div>
 
                       {/* Messages */}
-                      <div className="space-y-2.5 mb-4 max-h-64 overflow-y-auto pr-1">
+                      <div ref={messagesContainerRef} className="space-y-2.5 mb-4 max-h-64 overflow-y-auto pr-1">
                         {jobNotes.length === 0 ? (
                           <div className="flex flex-col items-center justify-center py-8 gap-2">
                             <div className="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center">
