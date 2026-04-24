@@ -103,13 +103,16 @@ See `backend/.env.example` — all variables are documented there. Create a `.en
 - Clients can view their jobs and job updates/notes but cannot create or edit anything.
 - All users can change their own password from their profile page.
 - Scheduled date on a job is optional.
+- Demo accounts (admin@demo.com, tech@demo.com, client@demo.com) are restricted — credentials cannot be changed and demo admin cannot edit or delete any user.
+- Make Demo acounts from main admin acount if you want to make demo accounts for others for testing
+- Clients and technicians can message each other directly within a job. Notifications are triggered on every new message.
 
 ## Trade-offs
 
 - Chose JWT over sessions — simpler to setup, no session store needed, works fine for this scale.
 - In-app notifications over email — keeps the project running fully locally without any third party service. In a real product id hook this up to something like SendGrid.
 - No pagination yet — acceptable for a small dataset but would add it before going to production.
-- Frontend is functional not polished and responsive — focused on getting all the flows working correctly.
+- Frontend is functional, polished, and responsive — focused on getting all the flows working correctly.
 - No unit tests written — would add these with more time, especially for the auth middleware and job assignment logic.
 
 ## What's Missing
@@ -119,7 +122,8 @@ See `backend/.env.example` — all variables are documented there. Create a `.en
 - Unit and integration tests
 - Docker setup
 - Password reset via email (forgot password flow)
-- Client job request flow (clients submit request → admin approves → converted into job)
+- Client job request flow (clients submit a service request → admin reviews and converts it into a job)
+- Audit log — full history of who changed what and when (job notes partially cover this)
 
 ## API Reference
 
