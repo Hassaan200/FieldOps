@@ -31,6 +31,19 @@ export const getAllUsers = async (req, res) => {
 export const updateUser = async (req, res) => {
   const { id } = req.params;
   const { name, email, role, password } = req.body;
+  
+  // agar logged in user demo admin hai tou kisi ko bhi edit na kar sake
+  if (req.user.email === 'admin@demo.com') {
+    return res.status(403).json({ message: 'Demo admin cannot edit any user.' });
+  }
+
+  // demo accounts protect karo
+  const demoEmails = ['admin@demo.com', 'tech@demo.com', 'client@demo.com'];
+  const [targetUser] = await pool.query(`SELECT * FROM users WHERE id = ?`, [id]);
+  
+  if (targetUser.length > 0 && demoEmails.includes(targetUser[0].email)) {
+    return res.status(403).json({ message: 'Demo accounts cannot be modified.' });
+  }
 
   try {
     const [existing] = await pool.query(`SELECT * FROM users WHERE id = ?`, [id]);
@@ -59,6 +72,19 @@ export const updateUser = async (req, res) => {
 // Admin - user delete kare
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
+  
+  // agar logged in user demo admin hai tou kisi ko bhi delete na kar sake
+  if (req.user.email === 'admin@demo.com') {
+    return res.status(403).json({ message: 'Demo admin cannot delete any user.' });
+  }
+  
+  // demo accounts protect karo
+  const demoEmails = ['admin@demo.com', 'tech@demo.com', 'client@demo.com'];
+  const [targetUser] = await pool.query(`SELECT * FROM users WHERE id = ?`, [id]);
+
+  if (targetUser.length > 0 && demoEmails.includes(targetUser[0].email)) {
+    return res.status(403).json({ message: 'Demo accounts cannot be deleted.' });
+  }
 
   try {
     if (parseInt(id) === req.user.id) {
@@ -100,6 +126,14 @@ export const deleteUser = async (req, res) => {
 
 export const changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
+
+  // demo accounts protect karo
+  const demoEmails = ['admin@demo.com', 'tech@demo.com', 'client@demo.com'];
+  const [rows] = await pool.query(`SELECT * FROM users WHERE id = ?`, [req.user.id]);
+  
+  if (rows.length > 0 && demoEmails.includes(rows[0].email)) {
+    return res.status(403).json({ message: 'Demo account credentials cannot be changed.' });
+  }
 
   if (!currentPassword || !newPassword) {
     return res.status(400).json({ message: 'Both fields are required' });

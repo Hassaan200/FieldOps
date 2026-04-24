@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 import Navbar from '../../components/Navbar';
 
@@ -13,6 +14,9 @@ const emptyForm = { name: '', email: '', password: '', role: 'client' };
 const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-300 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all duration-150";
 
 const ManageUsers = () => {
+  const { user: currentUser } = useAuth();
+  const isDemoAdmin = currentUser?.email === 'admin@demo.com';
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -119,13 +123,44 @@ const ManageUsers = () => {
     );
   };
 
+  const ActionButtons = ({ user }) => {
+    if (isDemoAdmin) {
+      return (
+        <span className="text-[11px] text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg italic">
+          Demo — restricted
+        </span>
+      );
+    }
+    return (
+      <>
+        <button
+          onClick={() => openEdit(user)}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a3a2a] bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3 h-3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Edit
+        </button>
+        <button
+          onClick={() => handleDelete(user.id)}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-500 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3 h-3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Delete
+        </button>
+      </>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#f5f6f7]">
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
 
-        {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-gray-400 mb-1">Admin</p>
@@ -143,7 +178,15 @@ const ManageUsers = () => {
           </button>
         </div>
 
-        {/* Section label */}
+        {isDemoAdmin && (
+          <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl mb-6 text-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4 flex-shrink-0">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            This is a demo admin account. User editing and deletion is disabled.
+          </div>
+        )}
+
         <div className="flex items-center gap-3 mb-4">
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
             {!loading && `${users.length} user${users.length !== 1 ? 's' : ''}`}
@@ -151,7 +194,6 @@ const ManageUsers = () => {
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
-        {/* Table Card */}
         {loading ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="h-1 w-full bg-gradient-to-r from-[#1a3a2a] via-emerald-500 to-emerald-300" />
@@ -196,24 +238,7 @@ const ManageUsers = () => {
                       Joined {new Date(user.created_at).toLocaleDateString()}
                     </p>
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => openEdit(user)}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#1a3a2a] bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                      >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3 h-3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-red-500 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                      >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3 h-3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Delete
-                      </button>
+                      <ActionButtons user={user} />
                     </div>
                   </div>
                 </div>
@@ -248,24 +273,7 @@ const ManageUsers = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => openEdit(user)}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1a3a2a] bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3 h-3">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user.id)}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-500 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3 h-3">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Delete
-                          </button>
+                          <ActionButtons user={user} />
                         </div>
                       </td>
                     </tr>
@@ -282,9 +290,7 @@ const ManageUsers = () => {
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl shadow-gray-300/40 w-full max-w-md overflow-hidden">
             <div className="h-1 w-full bg-gradient-to-r from-[#1a3a2a] via-emerald-500 to-emerald-300" />
-
             <div className="p-6">
-              {/* Modal header */}
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-base font-bold text-gray-900">

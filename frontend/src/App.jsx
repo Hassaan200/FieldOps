@@ -9,12 +9,14 @@ import TechnicianJobs from './pages/technician/MyJobs';
 import ClientJobs from './pages/client/MyJobs';
 import ManageUsers from './pages/admin/ManageUsers';
 import Profile from './pages/admin/Profile';
+import Landing from './pages/Landing';
 
 const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
 
           <Route path="/admin/dashboard" element={
@@ -43,7 +45,7 @@ const App = () => {
             <ProtectedRoute><Profile /></ProtectedRoute>
           } />
 
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

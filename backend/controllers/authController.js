@@ -26,7 +26,7 @@ const login = async (req, res) => {
     );
 
     console.log('Login successful:', email, '| Role:', user.role);
-    res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (err) {
     console.error('Database error:', err.message);
     res.status(500).json({ message: 'Server error', error: err.message });

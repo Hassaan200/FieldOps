@@ -97,6 +97,15 @@ const Login = () => {
             <span className="text-[#1a3a2a] font-bold text-base tracking-tight">FieldOps</span>
           </div>
 
+          <button
+            onClick={() => navigate("/")}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-[#1a3a2a] transition-colors mb-6 cursor-pointer group"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Home
+          </button>
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Welcome back</h2>
             <p className="text-sm text-gray-400 mt-1">Sign in to your account to continue</p>
